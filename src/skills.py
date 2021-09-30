@@ -1,3 +1,9 @@
+"""
+Base implementations for home automation skills
+
+Copyright (c) 2021 Timo Haeckel
+"""
+
 from threading import Thread, Event
 import sys
 import traceback
@@ -116,7 +122,7 @@ class Skill(Thread):
         self.stopEvent.set()
 
 
-class SkillWithState(Skill):
+class SkillWithState(Skill, statedb.StateDataBaseObserver):
     """ A Skill with a connection the state data base.
 
     An abstract implementation extending a basic Skill with 
@@ -256,5 +262,6 @@ class SkillWithState(Skill):
         -------
         complex type
             The value of the state which can be of any complex type
+            None if the state does not exist
         """
         return self.statedb.getState(stateName)
