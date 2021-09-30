@@ -6,6 +6,7 @@ Copyright (c) 2021 Timo Haeckel
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
+from threading import Lock
 
 
 class StateDataBaseObserver(ABC):
@@ -42,7 +43,8 @@ class StateDataBase:
     observers : dict(str, list(StateDataBaseObserver))
         Obeservers to be notified on state changes
         Key is the name of the state, the value is a list of StateDataBaseObservers
-    
+    mutex : threading.Lock
+        Mutex to ensure thread safety for multiple skills accessing the states
     """
     def __init__(self, initialStates=dict()):
         """ 
@@ -54,6 +56,7 @@ class StateDataBase:
         """
         self.states = initialStates
         self.observers = dict()
+        self.mutex = Lock()
 
     def getState(self, key):
         """ Get the value of the state with the given key.
@@ -69,10 +72,12 @@ class StateDataBase:
             The value of the state which can be of any complex type
             None if the state does not exist
         """
+        self.mutex.acquire()
+        value = None
         if key in self.states:
-            return self.states[key]
-        else:
-            return None
+            value = self.states[key]
+        self.mutex.release()
+        return value
 
     def setState(self, key, value):
         """ Sets the state of key with the given value.
@@ -87,9 +92,11 @@ class StateDataBase:
         value : complex type
             The value of the state to be set which can be of any complex type
         """
+        self.mutex.acquire()
         if len(key) > 0:
             self.states[key] = value
             self.notifyObservers(key)
+        self.mutex.release()
 
     def registerObserver(self, key, observer: StateDataBaseObserver):
         """ Register a callbackFct to notify when the state with the key changes.
