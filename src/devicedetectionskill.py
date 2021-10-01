@@ -1,5 +1,5 @@
 """
-Base implementations for home automation skills
+Skill to detect active devices
 
 DevicePresenceState is a state data object for the DetectDevicePresenceSkill.
 DetectDevicePresenceSkill is a Skill to detect devices present in the network.
