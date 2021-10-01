@@ -7,7 +7,7 @@ SkillWithState implements a Skill with a connection to the state data base.
 Copyright (c) 2021 Timo Haeckel
 """
 
-from threading import Thread
+from threading import Thread, Event
 import sys
 import traceback
 import datetime
@@ -17,7 +17,6 @@ import statedb
 class Skill(Thread):
     def __init__(self,
                  name,
-                 stopEvent,
                  interval=0,
                  errorSilent=False,
                  logSilent=False,
@@ -27,8 +26,6 @@ class Skill(Thread):
         ----------
         name : str
             The name of the skill
-        stopEvent : threading.Event
-            A thread event that is used to stop this thread
         interval : int (Default 0)   
             The time in seconds to wait between each execution of the skill
         errorSilent : Boolean (Default False)
@@ -40,7 +37,7 @@ class Skill(Thread):
         """
         Thread.__init__(self)
         self.name = name
-        self.stopEvent = stopEvent
+        self.stopEvent = Event()
         self.interval = interval
         self.errorSilent = errorSilent
         self.logSilent = logSilent
@@ -80,7 +77,7 @@ class Skill(Thread):
             The log message to print
         """
         if not self.logSilent:
-            self.log(text=text + traceback.format_exc, level="INFO")
+            self.printLog(text=text, level="INFO")
 
     def error(self, text=""):
         """ Prints an error message.
@@ -94,7 +91,7 @@ class Skill(Thread):
             The error message to print
         """
         if not self.errorSilent:
-            self.log(text=text + traceback.format_exc, level="ERROR")
+            self.printLog(text=text + str(traceback.format_exc), level="ERROR")
 
     def run(self):
         """ Run function of the Skill !NOT ITS TASK!
@@ -142,8 +139,7 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
     """
     def __init__(self,
                  name,
-                 stopEvent,
-                 stateDataBase,
+                 statedb,
                  initialStates=dict(),
                  notifyOnStateChange=False,
                  interval=0,
@@ -155,9 +151,7 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         ----------
         name : str
             The name of the skill
-        stopEvent : threading.Event
-            A thread event that is used to stop this thread
-        stateDataBase : statedb.StateDataBase
+        statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
         initialStates : dict(str, complex type) (Default empty dict)
@@ -175,9 +169,13 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         logFile : str (Default "")
             Path to the log file to be used for errors and log messages
         """
-        Skill.__init__(self, name, stopEvent, interval, errorSilent, logSilent,
-                       logFile)
-        self.statedb = stateDataBase
+        Skill.__init__(self,
+                       name=name,
+                       interval=interval,
+                       errorSilent=errorSilent,
+                       logSilent=logSilent,
+                       logFile=logFile)
+        self.statedb = statedb
         self.initialStates = initialStates
         self.notifyOnChange = notifyOnStateChange
         self.initializeStates(initialStates, notifyOnStateChange)

@@ -76,8 +76,7 @@ class DetectDevicePresenceSkill(SkillWithState):
     STATE_PREFIX = "DevicePresence:"
 
     def __init__(self,
-                 stopEvent,
-                 stateDataBase,
+                 statedb,
                  deviceAddresses=[],
                  interval=60,
                  errorSilent=False,
@@ -86,9 +85,7 @@ class DetectDevicePresenceSkill(SkillWithState):
         """ 
         Parameters
         ----------
-        stopEvent : threading.Event
-            A thread event that is used to stop this thread
-        stateDataBase : statedb.StateDataBase
+        statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
         deviceAddresses : list(str) (Default empty list)
@@ -102,9 +99,13 @@ class DetectDevicePresenceSkill(SkillWithState):
         logFile : str (Default "")
             Path to the log file to be used for errors and log messages
         """
-        SkillWithState.__init__(self, "DetectDevicePresence", stopEvent,
-                                stateDataBase, interval, errorSilent,
-                                logSilent, logFile)
+        SkillWithState.__init__(self,
+                                name="DetectDevicePresence",
+                                statedb=statedb,
+                                interval=interval,
+                                errorSilent=errorSilent,
+                                logSilent=logSilent,
+                                logFile=logFile)
         self.addresses = deviceAddresses
 
     def task(self):
@@ -125,7 +126,7 @@ class DetectDevicePresenceSkill(SkillWithState):
                 deviceState = DevicePresenceState(host, result)
             else:
                 deviceState.setPresence(result)
-            self.updateState(self.STATE_PREFIX + host, result)
+            self.updateState(self.STATE_PREFIX + host, deviceState)
             if result == True:
                 self.log("Device " + host + " is reachable")
             else:
