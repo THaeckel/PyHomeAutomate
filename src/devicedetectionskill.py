@@ -130,7 +130,9 @@ class DetectDevicePresenceSkill(SkillWithState):
         for host in self.addresses:
             param = '-n' if platform.system().lower() == 'windows' else '-c'
             command = ['ping', param, '1', host, '-4']
-            result = subprocess.call(command) == 0
+            result = subprocess.call(command,
+                                     stdout=subprocess.DEVNULL,
+                                     stderr=subprocess.DEVNULL) == 0
             deviceState = self.readState(self.STATE_PREFIX + host)
             if deviceState is None:
                 deviceState = DevicePresenceState(host, result)
