@@ -1,10 +1,13 @@
 """
 Base implementations for home automation skills
 
+Skill class implements a thread with a task executed every interval.
+SkillWithState implements a Skill with a connection to the state data base.
+
 Copyright (c) 2021 Timo Haeckel
 """
 
-from threading import Thread, Event
+from threading import Thread
 import sys
 import traceback
 import datetime
@@ -27,7 +30,7 @@ class Skill(Thread):
         stopEvent : threading.Event
             A thread event that is used to stop this thread
         interval : int (Default 0)   
-            The time to wait between each execution of the skill
+            The time in seconds to wait between each execution of the skill
         errorSilent : Boolean (Default False)
             True if errors shall not be printed
         logSilent : Boolean (Default False)

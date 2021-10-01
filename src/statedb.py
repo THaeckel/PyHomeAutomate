@@ -72,11 +72,9 @@ class StateDataBase:
             The value of the state which can be of any complex type
             None if the state does not exist
         """
-        self.mutex.acquire()
         value = None
         if key in self.states:
             value = self.states[key]
-        self.mutex.release()
         return value
 
     def setState(self, key, value):
