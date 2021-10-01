@@ -8,18 +8,16 @@ import traceback
 import time
 import datetime
 from devicedetectionskill import DetectDevicePresenceSkill
+from wheatherskill import WeatherSkill
+from raumfeldskill import RaumfeldTVWakeup
 
-skillList = []
-statedb = statedb.StateDataBase()
 # logFile = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"
-deviceDetectionAddresses = ["localhost"]
-
-
-# Initialize your skills in this function!
-def createSkills():
-    detectSkill = DetectDevicePresenceSkill(
-        statedb=statedb, deviceAddresses=deviceDetectionAddresses, interval=10)
-    skillList.append(detectSkill)
+statedb = statedb.StateDataBase()
+skillList = [
+    DetectDevicePresenceSkill(statedb=statedb, interval=30),
+    WeatherSkill(statedb=statedb, interval=300),
+    RaumfeldTVWakeup(statedb=statedb, interval=30)
+]
 
 
 def startSkills():
@@ -41,7 +39,6 @@ def interruptSkills():
 if __name__ == "__main__":
     try:
         print("Starting")
-        createSkills()
         startSkills()
         joinSkills()
     except KeyboardInterrupt:

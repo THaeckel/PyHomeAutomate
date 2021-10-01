@@ -21,6 +21,13 @@ class WeatherSkill(SkillWithState):
     The DevicePresenceState() with the key STATE_PREFIX+ADDRESS will be
     constantly updated.
 
+    Settings
+    --------
+    {
+        "statePrefix" : "Weather",
+        "weatherRequestURL" : "http://weather.com/..."
+    }
+
     Attributes
     ----------
     addresses : list(str)
@@ -33,7 +40,6 @@ class WeatherSkill(SkillWithState):
 
     def __init__(self,
                  statedb,
-                 weatherRequestURL,
                  interval=60,
                  errorSilent=False,
                  logSilent=False,
@@ -44,8 +50,6 @@ class WeatherSkill(SkillWithState):
         statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
-        weatherRequestURL : str
-            URL to fetch the weather information from
         interval : int (Default 60)   
             The interval to fetch weather information in seconds
         errorSilent : Boolean (Default False)
@@ -56,13 +60,16 @@ class WeatherSkill(SkillWithState):
             Path to the log file to be used for errors and log messages
         """
         SkillWithState.__init__(self,
-                                name="DetectDevicePresence",
+                                name="Weather",
                                 statedb=statedb,
                                 interval=interval,
                                 errorSilent=errorSilent,
                                 logSilent=logSilent,
                                 logFile=logFile)
-        self.requestURL = weatherRequestURL
+        self.requestURL = self.findSkillSettingWithKey("weatherRequestURL")
+        prefix = self.findSkillSettingWithKey("statePrefix")
+        if prefix is not None:
+            self.STATE_PREFIX = prefix
 
     def task(self):
         """ Refreshes the weather information

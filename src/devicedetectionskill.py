@@ -65,6 +65,16 @@ class DetectDevicePresenceSkill(SkillWithState):
     The DevicePresenceState() with the key STATE_PREFIX+ADDRESS will be
     constantly updated.
 
+    Settings
+    --------
+    {
+        "statePrefix" : "DevicePresence:",
+        "deviceAddresses" : [
+            "localhost",
+            "192.168.178.12"
+        ]
+    }
+
     Attributes
     ----------
     addresses : list(str)
@@ -77,7 +87,6 @@ class DetectDevicePresenceSkill(SkillWithState):
 
     def __init__(self,
                  statedb,
-                 deviceAddresses=[],
                  interval=60,
                  errorSilent=False,
                  logSilent=False,
@@ -88,8 +97,6 @@ class DetectDevicePresenceSkill(SkillWithState):
         statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
-        deviceAddresses : list(str) (Default empty list)
-            The device IPv4 addresses to be detected in the local network
         interval : int (Default 60)   
             The detection interval to look for hosts in seconds
         errorSilent : Boolean (Default False)
@@ -106,7 +113,10 @@ class DetectDevicePresenceSkill(SkillWithState):
                                 errorSilent=errorSilent,
                                 logSilent=logSilent,
                                 logFile=logFile)
-        self.addresses = deviceAddresses
+        self.addresses = self.findSkillSettingWithKey("deviceAddresses")
+        prefix = self.findSkillSettingWithKey("statePrefix")
+        if prefix is not None:
+            self.STATE_PREFIX = prefix
 
     def task(self):
         """ Device presence detection task.

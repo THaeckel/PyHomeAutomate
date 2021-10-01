@@ -11,13 +11,59 @@ from threading import Thread, Event
 import sys
 import traceback
 import datetime
+import json
+from types import DictType
 import statedb
 
 
+def findKeyInJson(jsonDict, searchKey):
+    """ Search for recursive for a key in a JSON dictionary.
+
+    General purpose function to look for a key in a json file.
+
+    Parameters
+    ----------
+    jsonDict : dict()
+        Dictionary containing a json structure
+    searchKey : str
+        The key to look for in the settings
+
+    Returns
+    -------
+    value : jsonObject
+        The json object that is found behind the searchKey.
+    """
+    for key in jsonDict:
+        value = jsonDict[key]
+        if key == searchKey:
+            return value
+        elif isinstance(value, DictType):
+            #launch recursion
+            inner = findKeyInJson(value, searchKey)
+            if inner is not None:
+                return inner
+    return None
+
+
 class Skill(Thread):
+    """
+    Settings
+    --------
+    {
+        "SKILLNAME" : {
+            "setting1" : "value",
+            "setting2" : [
+                "value",
+                "value"
+                ]
+        }
+    }
+
+    """
     def __init__(self,
                  name,
                  interval=0,
+                 settingsFile="",
                  errorSilent=False,
                  logSilent=False,
                  logFile=""):
@@ -28,6 +74,8 @@ class Skill(Thread):
             The name of the skill
         interval : int (Default 0)   
             The time in seconds to wait between each execution of the skill
+        settingsFile : str
+            Path to the global skill settings file.
         errorSilent : Boolean (Default False)
             True if errors shall not be printed
         logSilent : Boolean (Default False)
@@ -39,9 +87,28 @@ class Skill(Thread):
         self.name = name
         self.stopEvent = Event()
         self.interval = interval
+        settings = open(settingsFile)
+        self.settings = json.load(settings)
+
         self.errorSilent = errorSilent
         self.logSilent = logSilent
         self.logFile = logFile
+
+    def findSkillSettingWithKey(self, settingKey):
+        """ Searches for the key in the skills json settings.
+        
+        Parameters
+        ----------
+        settingKey : str
+            The key to look for in the settings
+
+        Returns
+        -------
+        value : jsonObject
+            The json object that is found behind the searchKey.
+        """
+        skillSettings = findKeyInJson(self.settings, self.name)
+        return findKeyInJson(skillSettings, settingKey)
 
     def printLog(self, text, level="INFO"):
         """ Prints a log message.
@@ -140,8 +207,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
     def __init__(self,
                  name,
                  statedb,
-                 initialStates=dict(),
-                 notifyOnStateChange=False,
                  interval=0,
                  errorSilent=False,
                  logSilent=False,
@@ -154,12 +219,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
-        initialStates : dict(str, complex type) (Default empty dict)
-            States that are to be set during initialization in the statedb
-            Key is the name of the state, the value can be of any complex type
-        notifyOnStateChange : Boolean (Default False)
-            True if the stateChangedCallback function shall be registered for 
-            all initial states 
         interval : int (Default 0)   
             The time to wait between each execution of the skill
         errorSilent : Boolean (Default False)
@@ -176,29 +235,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
                        logSilent=logSilent,
                        logFile=logFile)
         self.statedb = statedb
-        self.initialStates = initialStates
-        self.notifyOnChange = notifyOnStateChange
-        self.initializeStates(initialStates, notifyOnStateChange)
-
-    def initializeStates(self, initialStates, notifyOnStateChange):
-        """ Initializes the state data base.
-
-        Initializes the state data base with the keys and values from 
-        the initialStates attribute.
-
-        Parameters
-        ----------
-        initialStates : dict(str, complex type) (Default empty dict)
-            States that are to be set during initialization in the statedb
-            Key is the name of the state, the value can be of any complex type
-        notifyOnStateChange : Boolean (Default False)
-            True if the stateChangedCallback function shall be registered for 
-            all initial states 
-        """
-        for key, value in initialStates.items():
-            self.updateState(key, value)
-            if notifyOnStateChange:
-                self.observeState(key)
 
     def stateChangedCallback(self, stateName, stateValue):
         """ Callback function for changes is the state data baseself.
