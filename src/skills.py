@@ -12,7 +12,6 @@ import sys
 import traceback
 import datetime
 import json
-from types import DictType
 import statedb
 
 
@@ -37,7 +36,7 @@ def findKeyInJson(jsonDict, searchKey):
         value = jsonDict[key]
         if key == searchKey:
             return value
-        elif isinstance(value, DictType):
+        elif isinstance(value, dict):
             #launch recursion
             inner = findKeyInJson(value, searchKey)
             if inner is not None:
@@ -58,7 +57,6 @@ class Skill(Thread):
                 ]
         }
     }
-
     """
     def __init__(self,
                  name,
@@ -87,8 +85,11 @@ class Skill(Thread):
         self.name = name
         self.stopEvent = Event()
         self.interval = interval
-        settings = open(settingsFile)
-        self.settings = json.load(settings)
+        if len(settingsFile) > 0:
+            settings = open(settingsFile)
+            self.settings = json.load(settings)
+        else:
+            self.settings = ""
 
         self.errorSilent = errorSilent
         self.logSilent = logSilent
@@ -107,8 +108,11 @@ class Skill(Thread):
         value : jsonObject
             The json object that is found behind the searchKey.
         """
-        skillSettings = findKeyInJson(self.settings, self.name)
-        return findKeyInJson(skillSettings, settingKey)
+        if len(self.settings) > 0:
+            skillSettings = findKeyInJson(self.settings, self.name)
+            return findKeyInJson(skillSettings, settingKey)
+        else:
+            return None
 
     def printLog(self, text, level="INFO"):
         """ Prints a log message.
@@ -208,6 +212,7 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
                  name,
                  statedb,
                  interval=0,
+                 settingsFile="",
                  errorSilent=False,
                  logSilent=False,
                  logFile=""):
@@ -221,6 +226,8 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
             the home automation setup
         interval : int (Default 0)   
             The time to wait between each execution of the skill
+        settingsFile : str
+            Path to the global skill settings file.
         errorSilent : Boolean (Default False)
             True if errors shall not be printed
         logSilent : Boolean (Default False)
@@ -231,6 +238,7 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         Skill.__init__(self,
                        name=name,
                        interval=interval,
+                       settingsFile=settingsFile,
                        errorSilent=errorSilent,
                        logSilent=logSilent,
                        logFile=logFile)

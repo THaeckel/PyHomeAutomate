@@ -38,6 +38,7 @@ class RaumfeldTVWakeup(SkillWithState):
     def __init__(self,
                  statedb,
                  interval=30,
+                 settingsFile="",
                  errorSilent=False,
                  logSilent=False,
                  logFile=""):
@@ -49,6 +50,8 @@ class RaumfeldTVWakeup(SkillWithState):
             the home automation setup
         interval : int (Default 60)   
             The detection interval to look for hosts in seconds
+        settingsFile : str
+            Path to the global skill settings file.
         errorSilent : Boolean (Default False)
             True if errors shall not be printed
         logSilent : Boolean (Default False)
@@ -60,6 +63,7 @@ class RaumfeldTVWakeup(SkillWithState):
                                 name="RaumfeldTVWakeup",
                                 statedb=statedb,
                                 interval=interval,
+                                settingsFile=settingsFile,
                                 errorSilent=errorSilent,
                                 logSilent=logSilent,
                                 logFile=logFile)

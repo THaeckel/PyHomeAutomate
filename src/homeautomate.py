@@ -12,11 +12,16 @@ from wheatherskill import WeatherSkill
 from raumfeldskill import RaumfeldTVWakeup
 
 # logFile = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"
+jsonSettingsFile = "my_skills_config.json"
 statedb = statedb.StateDataBase()
 skillList = [
-    DetectDevicePresenceSkill(statedb=statedb, interval=30),
-    WeatherSkill(statedb=statedb, interval=300),
-    RaumfeldTVWakeup(statedb=statedb, interval=30)
+    DetectDevicePresenceSkill(statedb=statedb,
+                              interval=30,
+                              settingsFile=jsonSettingsFile),
+    WeatherSkill(statedb=statedb, interval=300, settingsFile=jsonSettingsFile),
+    RaumfeldTVWakeup(statedb=statedb,
+                     interval=30,
+                     settingsFile=jsonSettingsFile)
 ]
 
 

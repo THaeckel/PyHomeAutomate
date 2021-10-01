@@ -41,6 +41,7 @@ class WeatherSkill(SkillWithState):
     def __init__(self,
                  statedb,
                  interval=60,
+                 settingsFile="",
                  errorSilent=False,
                  logSilent=False,
                  logFile=""):
@@ -52,6 +53,8 @@ class WeatherSkill(SkillWithState):
             the home automation setup
         interval : int (Default 60)   
             The interval to fetch weather information in seconds
+        interval : int (Default 0)   
+            The time to wait between each execution of the skill
         errorSilent : Boolean (Default False)
             True if errors shall not be printed
         logSilent : Boolean (Default False)
@@ -63,6 +66,7 @@ class WeatherSkill(SkillWithState):
                                 name="Weather",
                                 statedb=statedb,
                                 interval=interval,
+                                settingsFile=settingsFile,
                                 errorSilent=errorSilent,
                                 logSilent=logSilent,
                                 logFile=logFile)
