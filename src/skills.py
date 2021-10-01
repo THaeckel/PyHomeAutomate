@@ -60,7 +60,6 @@ class Skill(Thread):
     """
     def __init__(self,
                  name,
-                 interval=0,
                  settingsFile="",
                  errorSilent=False,
                  logSilent=False,
@@ -70,8 +69,6 @@ class Skill(Thread):
         ----------
         name : str
             The name of the skill
-        interval : int (Default 0)   
-            The time in seconds to wait between each execution of the skill
         settingsFile : str
             Path to the global skill settings file.
         errorSilent : Boolean (Default False)
@@ -84,12 +81,17 @@ class Skill(Thread):
         Thread.__init__(self)
         self.name = name
         self.stopEvent = Event()
-        self.interval = interval
         if len(settingsFile) > 0:
             settings = open(settingsFile)
             self.settings = json.load(settings)
         else:
             self.settings = ""
+
+        interval = self.findSkillSettingWithKey("interval")
+        if interval is not None:
+            self.interval = interval
+        else:
+            self.interval = 60
 
         self.errorSilent = errorSilent
         self.logSilent = logSilent
@@ -171,7 +173,7 @@ class Skill(Thread):
         is stopped whend the stopEvent is set. Please override the task() 
         function for your skill implementation not this function.
         """
-        self.log("skill launched ")
+        self.log("skill launched with interval " + str(self.interval))
         while not self.stopEvent.is_set():
             try:
                 self.task()
@@ -211,7 +213,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
     def __init__(self,
                  name,
                  statedb,
-                 interval=0,
                  settingsFile="",
                  errorSilent=False,
                  logSilent=False,
@@ -224,8 +225,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
-        interval : int (Default 0)   
-            The time to wait between each execution of the skill
         settingsFile : str
             Path to the global skill settings file.
         errorSilent : Boolean (Default False)
@@ -237,7 +236,6 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         """
         Skill.__init__(self,
                        name=name,
-                       interval=interval,
                        settingsFile=settingsFile,
                        errorSilent=errorSilent,
                        logSilent=logSilent,

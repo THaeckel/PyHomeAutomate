@@ -15,13 +15,9 @@ from raumfeldskill import RaumfeldTVWakeup
 jsonSettingsFile = "my_skills_config.json"
 statedb = statedb.StateDataBase()
 skillList = [
-    DetectDevicePresenceSkill(statedb=statedb,
-                              interval=30,
-                              settingsFile=jsonSettingsFile),
-    WeatherSkill(statedb=statedb, interval=300, settingsFile=jsonSettingsFile),
-    RaumfeldTVWakeup(statedb=statedb,
-                     interval=30,
-                     settingsFile=jsonSettingsFile)
+    DetectDevicePresenceSkill(statedb=statedb, settingsFile=jsonSettingsFile),
+    WeatherSkill(statedb=statedb, settingsFile=jsonSettingsFile),
+    RaumfeldTVWakeup(statedb=statedb, settingsFile=jsonSettingsFile)
 ]
 
 
