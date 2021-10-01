@@ -49,7 +49,13 @@ class Skill(Thread):
     Settings
     --------
     {
+        "GlobalSettings": {
+            "errorSilent": false,
+            "logSilent": false,
+            "logFile": ""
+        },
         "SKILLNAME" : {
+            "interval" : 60,
             "setting1" : "value",
             "setting2" : [
                 "value",
@@ -58,12 +64,7 @@ class Skill(Thread):
         }
     }
     """
-    def __init__(self,
-                 name,
-                 settingsFile="",
-                 errorSilent=False,
-                 logSilent=False,
-                 logFile=""):
+    def __init__(self, name, settingsFile=""):
         """ 
         Parameters
         ----------
@@ -71,12 +72,6 @@ class Skill(Thread):
             The name of the skill
         settingsFile : str
             Path to the global skill settings file.
-        errorSilent : Boolean (Default False)
-            True if errors shall not be printed
-        logSilent : Boolean (Default False)
-            True if log messages shall not be printed
-        logFile : str (Default "")
-            Path to the log file to be used for errors and log messages
         """
         Thread.__init__(self)
         self.name = name
@@ -87,15 +82,23 @@ class Skill(Thread):
         else:
             self.settings = ""
 
-        interval = self.findSkillSettingWithKey("interval")
-        if interval is not None:
-            self.interval = interval
-        else:
-            self.interval = 60
+        self.interval = self.findSkillSettingWithKeyOrDefault("interval", 60)
+        self.errorSilent = self.findSkillSettingWithKeyOrDefault(
+            "errorSilent", False)
+        self.logSilent = self.findSkillSettingWithKeyOrDefault(
+            "logSilent", False)
+        self.logFile = self.findSkillSettingWithKeyOrDefault("logFile", "")
 
-        self.errorSilent = errorSilent
-        self.logSilent = logSilent
-        self.logFile = logFile
+    def findSkillSettingWithKeyOrDefault(self, settingKey, defaultValue):
+        """ Uses findSkillSettingWithKey to find the value or returns defaultValue.
+
+        Searches for the key in the skills json settings and returns its value
+        or the defaulValue.
+        """
+        value = self.findSkillSettingWithKey(settingKey)
+        if value is not None:
+            return value
+        return defaultValue
 
     def findSkillSettingWithKey(self, settingKey):
         """ Searches for the key in the skills json settings.
@@ -210,13 +213,7 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
         Reference to the shared state data base instance used for 
         all skills in the home automation setup
     """
-    def __init__(self,
-                 name,
-                 statedb,
-                 settingsFile="",
-                 errorSilent=False,
-                 logSilent=False,
-                 logFile=""):
+    def __init__(self, name, statedb, settingsFile=""):
         """ 
         Parameters
         ----------
@@ -226,20 +223,9 @@ class SkillWithState(Skill, statedb.StateDataBaseObserver):
             The shared state data base instance used for all skills in 
             the home automation setup
         settingsFile : str
-            Path to the global skill settings file.
-        errorSilent : Boolean (Default False)
-            True if errors shall not be printed
-        logSilent : Boolean (Default False)
-            True if log messages shall not be printed
-        logFile : str (Default "")
-            Path to the log file to be used for errors and log messages
+            Path to the global skill settings file
         """
-        Skill.__init__(self,
-                       name=name,
-                       settingsFile=settingsFile,
-                       errorSilent=errorSilent,
-                       logSilent=logSilent,
-                       logFile=logFile)
+        Skill.__init__(self, name=name, settingsFile=settingsFile)
         self.statedb = statedb
 
     def stateChangedCallback(self, stateName, stateValue):

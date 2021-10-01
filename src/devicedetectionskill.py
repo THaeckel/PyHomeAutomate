@@ -83,8 +83,6 @@ class DetectDevicePresenceSkill(SkillWithState):
         A prefix used to form the state key in the state data base with 
         STATE_PREFIX + Address  
     """
-    STATE_PREFIX = "DevicePresence:"
-
     def __init__(self,
                  statedb,
                  settingsFile="",
@@ -98,25 +96,16 @@ class DetectDevicePresenceSkill(SkillWithState):
             The shared state data base instance used for all skills in 
             the home automation setup
         settingsFile : str
-            Path to the global skill settings file.
-        errorSilent : Boolean (Default False)
-            True if errors shall not be printed
-        logSilent : Boolean (Default False)
-            True if log messages shall not be printed
-        logFile : str (Default "")
-            Path to the log file to be used for errors and log messages
+            Path to the global skill settings file
         """
         SkillWithState.__init__(self,
                                 name="DetectDevicePresence",
                                 statedb=statedb,
-                                settingsFile=settingsFile,
-                                errorSilent=errorSilent,
-                                logSilent=logSilent,
-                                logFile=logFile)
-        self.addresses = self.findSkillSettingWithKey("deviceAddresses")
-        prefix = self.findSkillSettingWithKey("statePrefix")
-        if prefix is not None:
-            self.STATE_PREFIX = prefix
+                                settingsFile=settingsFile)
+        self.addresses = self.findSkillSettingWithKeyOrDefault(
+            "deviceAddresses", [])
+        self.STATE_PREFIX = self.findSkillSettingWithKeyOrDefault(
+            "statePrefix", "DevicePresence:")
 
     def task(self):
         """ Device presence detection task.

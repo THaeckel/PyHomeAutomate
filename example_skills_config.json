@@ -1,4 +1,9 @@
 {
+    "GlobalSettings": {
+        "errorSilent": false,
+        "logSilent": false,
+        "logFile": ""
+    },
     "Weather": {
         "interval": 300,
         "statePrefix": "Weather",

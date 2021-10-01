@@ -38,32 +38,20 @@ class WeatherSkill(SkillWithState):
     """
     STATE_PREFIX = "Weather"
 
-    def __init__(self,
-                 statedb,
-                 settingsFile="",
-                 errorSilent=False,
-                 logSilent=False,
-                 logFile=""):
+    def __init__(self, statedb, settingsFile=""):
         """ 
         Parameters
         ----------
         statedb : statedb.StateDataBase
             The shared state data base instance used for all skills in 
             the home automation setup
-        errorSilent : Boolean (Default False)
-            True if errors shall not be printed
-        logSilent : Boolean (Default False)
-            True if log messages shall not be printed
-        logFile : str (Default "")
-            Path to the log file to be used for errors and log messages
+        settingsFile : str
+            Path to the global skill settings file
         """
         SkillWithState.__init__(self,
                                 name="Weather",
                                 statedb=statedb,
-                                settingsFile=settingsFile,
-                                errorSilent=errorSilent,
-                                logSilent=logSilent,
-                                logFile=logFile)
+                                settingsFile=settingsFile)
         self.requestURL = self.findSkillSettingWithKey("weatherRequestURL")
         prefix = self.findSkillSettingWithKey("statePrefix")
         if prefix is not None:
