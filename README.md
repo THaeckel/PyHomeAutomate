@@ -1,2 +1,3 @@
 # PyHomeAutomate
-Basic implementation for home automation with interfaces for skills and state management and some common skills I thought off.
+Simple object oriented python implementation for home automation skills state management.
+Contains some skills implemented in my home network.
