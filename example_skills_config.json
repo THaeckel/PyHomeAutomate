@@ -1,0 +1,19 @@
+{
+    "Weather": {
+        "statePrefix": "Weather",
+        "weatherRequestURL": "https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={your api key}"
+    },
+    "DetectDevicePresence": {
+        "statePrefix": "DevicePresence:",
+        "deviceAddresses": [
+            "localhost",
+            "192.168.178.42",
+            "Peters-PC"
+        ]
+    },
+    "RaumfeldTVWakeup": {
+        "statePrefix": "DevicePresence:",
+        "tvAddress": "192.168.178.42",
+        "tvSpeakerRoomName": "TV Speaker"
+    }
+}
