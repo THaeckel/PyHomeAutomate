@@ -29,6 +29,7 @@ class DevicePresenceState():
         """ 
         lastDetectedAt will be automatically initialized with none if 
         currentlyPresent is false, else to the current datetime
+
         Parameters
         ----------
         address : str (mandatory)
@@ -83,12 +84,7 @@ class DetectDevicePresenceSkill(SkillWithState):
         A prefix used to form the state key in the state data base with 
         STATE_PREFIX + Address  
     """
-    def __init__(self,
-                 statedb,
-                 settingsFile="",
-                 errorSilent=False,
-                 logSilent=False,
-                 logFile=""):
+    def __init__(self, statedb, settingsFile=""):
         """ 
         Parameters
         ----------
