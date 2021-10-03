@@ -13,7 +13,7 @@ import datetime
 
 
 class DaytimeState():
-    """ State data object for the DetectDevicePresenceSkill.
+    """ State data object for the DaytimeSkill.
 
     Attributes
     ----------
@@ -189,15 +189,15 @@ class DaytimeSkill(SkillWithState):
             return DaytimeState.DAY_STR
 
         now = time.time()
-        if now >= (weather["sys"]["sunrise"] +
+        if now >= (weather.getSunriseTime() +
                    self.SUNRISE_PHASE_MINUTES) and now <= (
-                       weather["sys"]["sunset"] - self.SUNSET_PHASE_MINUTES):
+                       weather.getSunsetTime() - self.SUNSET_PHASE_MINUTES):
             return DaytimeState.DAY_STR
-        elif now > (weather["sys"]["sunset"] - self.SUNSET_PHASE_MINUTES
-                    ) and now < weather["sys"]["sunset"]:
+        elif now > (weather.getSunsetTime() - self.SUNSET_PHASE_MINUTES
+                    ) and now < weather.getSunsetTime():
             return DaytimeState.SUNSET_STR
-        elif now < (weather["sys"]["sunrise"] + self.SUNRISE_PHASE_MINUTES
-                    ) and now > weather["sys"]["sunrise"]:
+        elif now < (weather.getSunriseTime() + self.SUNRISE_PHASE_MINUTES
+                    ) and now > weather.getSunriseTime():
             return DaytimeState.SUNSET_STR
         else:
             return DaytimeState.NIGHT_STR

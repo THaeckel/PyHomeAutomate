@@ -12,6 +12,45 @@ import requests
 import json
 
 
+class WeatherState():
+    """ State data object for the WeatherSkill.
+
+    Attributes
+    ----------
+    raw : json
+        Raw weather data json object from weather service
+    """
+    def __init__(self, weatherData=None):
+        self.raw = weatherData
+
+    def getJson(self):
+        return self.raw
+
+    def getSunsetTime(self):
+        if self.raw is not None:
+            return self.raw["sys"]["sunset"]
+        else:
+            return None
+
+    def getSunriseTime(self):
+        if self.raw is not None:
+            return self.raw["sys"]["sunrise"]
+        else:
+            return None
+
+    def getClouds(self):
+        if self.raw is not None:
+            return self.raw["clouds"]["all"]
+        else:
+            return 0
+
+    def isRaining(self):
+        if self.raw is not None:
+            return "rain" in self.raw["weather"][0]["description"]
+        else:
+            return False
+
+
 class WeatherSkill(SkillWithState):
     """ Skill to detect devices present in the network.
 
@@ -65,4 +104,4 @@ class WeatherSkill(SkillWithState):
         """
         weather = requests.get(self.requestURL).json()
         self.log("current weather:\n" + json.dumps(weather, indent=4))
-        self.updateState(self.STATE_PREFIX, weather)
+        self.updateState(self.STATE_PREFIX, WeatherState(weatherData=weather))
