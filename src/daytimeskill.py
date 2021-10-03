@@ -181,7 +181,7 @@ class DaytimeSkill(SkillWithState):
 
         Returns
         -------
-        str : one DaytimeState.options
+        str : one of DaytimeState.options
         """
         weather = self.readState(self.WEATHER_STATE_PREFIX)
         if weather is None:
@@ -217,6 +217,7 @@ class DaytimeSkill(SkillWithState):
         daytimeState.bedTime = bedTime
         dayTime = self.getDayTime()
         daytimeState.setDayTime(dayTime)
+        self.updateState(self.STATE_PREFIX, daytimeState)
 
         if bedTime:
             self.log("It is " + dayTime + " and you should be sleeping!")
