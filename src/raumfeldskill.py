@@ -1,8 +1,7 @@
 """
-Skill to detect active devices
+Skills to control teufel raumfeld streaming devices
 
-DevicePresenceState is a state data object for the DetectDevicePresenceSkill.
-DetectDevicePresenceSkill is a Skill to detect devices present in the network.
+RaumfeldTVWakeup is a Skill that wakes up a speaker when the TV is turned on.
 
 Copyright (c) 2021 Timo Haeckel
 """
