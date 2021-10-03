@@ -113,8 +113,11 @@ class HueDaytimeAndWeatherSkill(SkillWithState):
         """
         if len(self.lightsToAutomate) > 0:
             for light in self.lightsToAutomate:
-                self.hue.set_light(light, "on", False)
-                self.log("Turned light " + light + " off")
+                if not self.hue.get_light(light)["state"]["reachable"]:
+                    self.log("Light " + light + " unreachable ")
+                else:
+                    self.hue.set_light(light, "on", False)
+                    self.log("Turned light " + light + " off")
 
     def getRoomForLightName(self, light):
         """ Get a room from the light name
@@ -148,10 +151,15 @@ class HueDaytimeAndWeatherSkill(SkillWithState):
         """
         if len(self.lightsToAutomate) > 0:
             for light in self.lightsToAutomate:
-                self.hue.run_scene(self.getRoomForLightName(light),
-                                   scene,
-                                   transition_time=self.sceneTransitionTime)
-                self.log("Activated scene " + scene + " for light " + light)
+                if not self.hue.get_light(light)["state"]["reachable"]:
+                    self.log("Light " + light + " unreachable ")
+                else:
+                    self.hue.run_scene(
+                        self.getRoomForLightName(light),
+                        scene,
+                        transition_time=self.sceneTransitionTime)
+                    self.log("Activated scene " + scene + " for light " +
+                             light)
 
     def activateSleepMode(self):
         """ Activates the sleep mode for all lightsToAutomate
