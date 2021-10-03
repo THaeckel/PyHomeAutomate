@@ -11,6 +11,7 @@ from devicedetectionskill import DetectDevicePresenceSkill
 from wheatherskill import WeatherSkill
 from daytimeskill import DaytimeSkill
 from raumfeldskill import RaumfeldTVWakeup
+from hueskill import HueDaytimeAndWeatherSkill
 
 # logFile = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"
 jsonSettingsFile = "my_skills_config.json"
@@ -19,7 +20,8 @@ skillList = [
     DetectDevicePresenceSkill(statedb=statedb, settingsFile=jsonSettingsFile),
     WeatherSkill(statedb=statedb, settingsFile=jsonSettingsFile),
     DaytimeSkill(statedb=statedb, settingsFile=jsonSettingsFile),
-    RaumfeldTVWakeup(statedb=statedb, settingsFile=jsonSettingsFile)
+    RaumfeldTVWakeup(statedb=statedb, settingsFile=jsonSettingsFile),
+    HueDaytimeAndWeatherSkill(statedb=statedb, settingsFile=jsonSettingsFile)
 ]
 
 

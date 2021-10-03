@@ -25,6 +25,7 @@
         "tvSpeakerRoomName": "TV Speaker"
     },
     "Daytime": {
+        "interval": 300,
         "statePrefix": "Daytime",
         "weatherStatePrefix": "Weather",
         "bedTime": {
@@ -38,5 +39,21 @@
         },
         "sunrisePhaseMinutes": 0,
         "sunsetPhaseMinutes": 45
+    },
+    "HueDaytimeAndWeather": {
+        "interval": 60,
+        "daytimeStatePrefix": "Daytime",
+        "weatherStatePrefix": "Weather",
+        "hueBridgeIp": "192.168.178.42",
+        "lightsToAutomate": [
+            "Desklamp",
+            "Kitchen Mainlight"
+        ],
+        "sceneNightMode": "Gedimmt",
+        "sceneDayModeLight": "Energie tanken",
+        "sceneDayModeDark": "Hell",
+        "maxCloudsClear": 80,
+        "minCloudsCloudy": 90,
+        "sceneTransitionTime": 300
     }
 }
