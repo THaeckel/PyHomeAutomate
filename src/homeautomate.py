@@ -9,6 +9,7 @@ import time
 import datetime
 from devicedetectionskill import DetectDevicePresenceSkill
 from wheatherskill import WeatherSkill
+from daytimeskill import DaytimeSkill
 from raumfeldskill import RaumfeldTVWakeup
 
 # logFile = str(datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")) + ".log"
@@ -17,6 +18,7 @@ statedb = statedb.StateDataBase()
 skillList = [
     DetectDevicePresenceSkill(statedb=statedb, settingsFile=jsonSettingsFile),
     WeatherSkill(statedb=statedb, settingsFile=jsonSettingsFile),
+    DaytimeSkill(statedb=statedb, settingsFile=jsonSettingsFile),
     RaumfeldTVWakeup(statedb=statedb, settingsFile=jsonSettingsFile)
 ]
 

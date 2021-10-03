@@ -74,7 +74,8 @@ class DaytimeSkill(SkillWithState):
     Settings
     --------
     {
-        "statePrefix" : "DayTime",
+        "statePrefix" : "Daytime",
+        "weatherStatePrefix" : "Weather",
         "bedTime" : {
             "monday" : "23:00-07:00",            
             "tuesday" : "23:00-07:00",
@@ -83,7 +84,9 @@ class DaytimeSkill(SkillWithState):
             "friday" : "03:00-08:00",
             "saturday" : "03:00-08:00",
             "sunday" : "23:00-07:00"
-        }
+        },
+        "sunrisePhaseMinutes" : 0,
+        "sunsetPhaseMinutes" : 45
     }
 
     Attributes
@@ -92,6 +95,12 @@ class DaytimeSkill(SkillWithState):
         The bedtime as described in the settings
     STATE_PREFIX : str
         A prefix used to form the state key in the state data base
+    WEATHER_STATE_PREFIX : str
+        A prefix used to access the weather state
+    SUNRISE_PHASE_MINUTES : int
+        Minutes sunrise is detected after the actual sunrise
+    SUNSET_PHASE_MINUTES : int
+        Minutes sunset is detected before the actual sunset
     """
     def __init__(self, statedb, settingsFile=""):
         """ 
@@ -109,10 +118,13 @@ class DaytimeSkill(SkillWithState):
                                 settingsFile=settingsFile)
         self.STATE_PREFIX = self.findSkillSettingWithKeyOrDefault(
             "statePrefix", "Daytime")
-        bedTime = self.findSkillSettingWithKeyOrDefault("bedTime", dict())
-        if len(bedTime) > 0:
-            for day, timeInterval in bedTime.items():
-                self.bedTime[day] = self.parseTimeInterval(day, timeInterval)
+        self.WEATHER_STATE_PREFIX = self.findSkillSettingWithKeyOrDefault(
+            "weatherStatePrefix", "Weather")
+        self.bedTime = self.findSkillSettingWithKeyOrDefault("bedTime", dict())
+        self.SUNRISE_PHASE_MINUTES = self.findSkillSettingWithKeyOrDefault(
+            "sunrisePhaseMinutes", 0) * 60
+        self.SUNSET_PHASE_MINUTES = self.findSkillSettingWithKeyOrDefault(
+            "sunsetPhaseMinutes", 45) * 60
 
     def checkBedTime(self):
         """ 
@@ -164,7 +176,31 @@ class DaytimeSkill(SkillWithState):
         return False
 
     def getDayTime(self):
-        pass
+        """ 
+        Checks current daytime based on the weather information.
+
+        Returns
+        -------
+        str : one DaytimeState.options
+        """
+        weather = self.readState(self.WEATHER_STATE_PREFIX)
+        if weather is None:
+            self.log("No weather information --> Day")
+            return DaytimeState.DAY_STR
+
+        now = time.time()
+        if now >= (weather["sys"]["sunrise"] +
+                   self.SUNRISE_PHASE_MINUTES) and now <= (
+                       weather["sys"]["sunset"] - self.SUNSET_PHASE_MINUTES):
+            return DaytimeState.DAY_STR
+        elif now > (weather["sys"]["sunset"] - self.SUNSET_PHASE_MINUTES
+                    ) and now < weather["sys"]["sunset"]:
+            return DaytimeState.SUNSET_STR
+        elif now < (weather["sys"]["sunrise"] + self.SUNRISE_PHASE_MINUTES
+                    ) and now > weather["sys"]["sunrise"]:
+            return DaytimeState.SUNSET_STR
+        else:
+            return DaytimeState.NIGHT_STR
 
     def task(self):
         """ Detects the current daytime

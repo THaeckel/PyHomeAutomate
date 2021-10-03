@@ -23,5 +23,20 @@
         "statePrefix": "DevicePresence:",
         "tvAddress": "192.168.178.42",
         "tvSpeakerRoomName": "TV Speaker"
+    },
+    "Daytime": {
+        "statePrefix": "Daytime",
+        "weatherStatePrefix": "Weather",
+        "bedTime": {
+            "monday": "23:00-07:00",
+            "tuesday": "23:00-07:00",
+            "wednesday": "23:00-07:00",
+            "thirsday": "23:00-07:00",
+            "friday": "03:00-08:00",
+            "saturday": "03:00-08:00",
+            "sunday": "23:00-07:00"
+        },
+        "sunrisePhaseMinutes": 0,
+        "sunsetPhaseMinutes": 45
     }
 }
